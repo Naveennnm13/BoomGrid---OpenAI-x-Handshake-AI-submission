@@ -1,0 +1,54 @@
+HANDSHAKE AI SKILLS STUDIO X OPENAI
+CREATE A MULTIPLAYER GAME
+
+REQUIRED SUBMISSION FIELDS
+
+Project title
+BoomGrid
+
+Project URL
+https://boomgrid.vercel.app/
+
+Project cover image
+BoomGrid-Cover.jpg
+Actual screenshot of the public Vercel landing page, 1363 x 936 pixels.
+
+Project description
+BoomGrid is a browser party game for 2–6 players built around one simple idea: hide three numbers and hunt everyone else's. Each hidden number is a life. On your turn, choose any surviving opponent, aim at a number, and fire. The blast resolves before the next player acts; the last player alive wins.
+
+The strategy comes from limited powers: Double Shot attacks two numbers, Suicide Bomb trades one of your lives for an opponent's, Invincibility protects you until your next turn, and Radar scans a row or column. Every board stays visible, so players can follow the action and choose their next target. Arcade explosions, original synthesized music, scrollable highlights, and table chat with typing indicators give the match its personality.
+
+Friends join with a room code, without an account or app install. A visual guided tour and bot practice help new players learn before joining friends on a phone or laptop.
+
+I used ChatGPT Work to build and iterate on BoomGrid, directing the rules, arcade style, tutorial, mobile layout, and attack timing through repeated feedback. The game uses React, TypeScript, Next.js, and Tailwind CSS, with a Vercel frontend and a shared game backend. Validation includes 31 automated tests and two-player production checks for joining, turn order, and synchronized hits.
+
+OPTIONAL SHORT DESCRIPTION (364 characters)
+BoomGrid is a turn-based browser party game for 2–6 players. Hide three numbers, hunt your rivals, and use limited powers to stay alive. Friends join by room code with no account or install. A visual tutorial, bot practice, arcade explosions, music, live highlights, and table chat make it easy to learn and replay. Built with ChatGPT Work and published on Vercel.
+
+SUBMISSION GUIDE
+1. Open the Handshake Create a Multiplayer Game mission:
+https://app.joinhandshake.com/learn/create-a-multiplayer-game-8d7d59b5
+2. Add the title, public URL, cover image, and full description above. Use the short description if the form has a tighter character limit.
+3. Review the entry and contest terms, then submit from your Handshake account.
+
+The official PDF specifies October 30, 2026 at 11:59 p.m. Pacific, which is October 31 at 2:59 a.m. Eastern. The overview page says October 31; use the earlier, precise deadline in the official rules.
+Official rules: https://go.joinhandshake.com/rs/390-ZTF-353/images/%5BAI_Skills_Studio_Challenge%5D_Contest_Official_Rules.pdf?version=0
+Mission overview: https://joinhandshake.com/learn/create-a-multiplayer-game-8d7d59b5/
+
+QUICK DEMO
+1. Open the URL and try Guided tour.
+2. For solo testing choose Practice vs bots. For a live match, host a game and have a friend join the room code on another device or browser profile.
+3. Hide three different numbers and lock them in.
+4. On your turn, tap a number on an opponent's board and press Fire. Watch the impact, the highlights, and the next player's turn.
+5. Try a power-up. Eliminated players are skipped; the last survivor wins.
+
+VERIFICATION AND LIMITS
+- Next.js production build succeeded on Vercel.
+- All 31 automated engine tests passed.
+- Two independent player identities joined a production room through the Vercel API; a hit was resolved and observed by the other player.
+- Out-of-turn rejection is covered by engine tests and the earlier live-backend check.
+- No runtime errors were returned in the immediate post-deployment error scan.
+- The Vercel frontend depends on the existing authoritative game backend and database; keep that deployment online.
+- A 100–200 concurrent-player load test has not been performed.
+
+This package contains submission materials. It is not a confirmation of entry.

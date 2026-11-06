@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {advance,chooseBotAction,fillPracticeSeats,newRoom,pickNumbers,startMatch,validateAction} from '../lib/game.ts';
+function rng(seed=123456){let x=seed>>>0;return()=>{x=(1664525*x+1013904223)>>>0;return x/4294967296;};}
+function practice(count,seed=1,human=true){const random=rng(seed),g=newRoom('BOT234','Human','human',true,0,undefined,false,false);fillPracticeSeats(g,g.hostId,count,random);if(!human)g.players[0].isBot=true;startMatch(g,g.hostId,0,random);return{g,random};}
+function finish(g,random){let steps=0;while(g.phase!=='ended'&&steps++<700){if(g.phase==='picking')advance(g,g.deadline,random);else if(g.phase==='choosing')advance(g,g.deadline,random);else if(g.phase==='reveal')advance(g,g.deadline,random);}assert.equal(g.phase,'ended',`match did not finish after ${steps} advances`);assert.ok(g.winnerIds.length>=1);return steps;}
+
+test('practice fills the selected 2 to 6 seats with labeled bots and secret random picks',()=>{for(const count of [2,3,4,5,6]){const {g}=practice(count,count);assert.equal(g.players.length,count);assert.equal(g.players.slice(1).every(p=>p.isBot),true);assert.equal(g.players.slice(1).every(p=>p.picks.length===3&&new Set(p.picks).size===3),true);}const {g}=practice(2);assert.throws(()=>fillPracticeSeats(g,g.hostId,7),/practice lobby|2 to 6/);});
+
+test('bots wait 2 to 6 seconds before visibly locking an action',()=>{const {g,random}=practice(2,9);pickNumbers(g,g.hostId,[1,2,3],1);assert.equal(g.phase,'choosing');const bot=g.players[1];assert.ok(bot.botActAt>=2001&&bot.botActAt<=6001);advance(g,bot.botActAt-1,random);assert.equal(bot.lockedIn,false);advance(g,bot.botActAt,random);assert.equal(bot.lockedIn,true);assert.equal(g.phase,'choosing');});
+
+test('bot priorities cover emergency Invincibility, finishing Bomb, scheduled Double Shot and Radar',()=>{const {g}=practice(3,4,false);const bot=g.players[0],a=g.players[1],b=g.players[2];bot.dead=bot.picks.slice(0,2);assert.equal(chooseBotAction(g,bot,()=>0).kind,'invincible');bot.dead=[];bot.powers.invincible=false;a.dead=a.picks.slice(0,2);const bomb=chooseBotAction(g,bot,()=>0);assert.equal(bomb.kind,'bomb');assert.equal(bomb.targetId,a.id);a.dead=[];bot.powers.bomb=false;bot.botPlan.doubleRounds=[g.round,8];const double=chooseBotAction(g,bot,()=>0);assert.equal(double.kind,'doubleShot');assert.equal(double.numbers.length,2);bot.botPlan.doubleRounds=[7,8];bot.botPlan.radarRound=g.round;const radar=chooseBotAction(g,bot,()=>0);assert.equal(radar.kind,'radar');validateAction(g,bot,radar);assert.notEqual(radar.targetId,bot.id);assert.ok(['row','col'].includes(radar.line.axis));assert.ok(b.alive);});
+
+test('bots use a positive Radar line for 70 percent of later attacks',()=>{const {g}=practice(3,11,false);const bot=g.players[0],target=g.players[1];bot.powers.invincible=false;bot.powers.bomb=false;bot.powers.doubleShot=0;bot.powers.radar=false;bot.radarReadings=[{round:1,targetId:target.id,axis:'row',index:0,count:1}];const guided=chooseBotAction(g,bot,()=>0);assert.equal(guided.kind,'attack');assert.equal(guided.targetId,target.id);assert.ok(guided.numbers[0]>=1&&guided.numbers[0]<=5);});
+
+test('full bot matches finish without errors at 2, 4 and 6 seats',()=>{for(const count of [2,4,6]){const {g,random}=practice(count,100+count,false);const steps=finish(g,random);assert.ok(steps<700);assert.equal(g.players.every(p=>p.picks.length===3),true);}});
+
+test('one human can idle through a complete six-seat practice match',()=>{const {g,random}=practice(6,808,true);assert.equal(g.phase,'picking');const steps=finish(g,random);assert.ok(steps<700);assert.equal(g.players.filter(p=>p.isBot).length,5);assert.ok(g.lastResolution.some(e=>e.type==='win'));});
